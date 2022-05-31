@@ -12,8 +12,13 @@ const session = require('express-session')
 // routes
 const campgroundRoutes = require('./routes/campground')
 const reviewsRoutes = require('./routes/review')
+const authenticationRoutes = require('./routes/auth')
 // flash
 const flash = require('connect-flash')
+// passport 
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+const User = require('./model/user')
 
 
 // connecting to database with name yel-camp
@@ -44,7 +49,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 // sessions
-// expire date so the user doesn't say authenticated
+// expire date so the user doesn't stay authenticated
 // this is good for the user to signin again after one week of the cookie expiring 
 const sessionConfig = {
     secret: 'thisshouldbetter',
@@ -60,15 +65,38 @@ const sessionConfig = {
 app.use(session(sessionConfig))
 app.use(flash())
 
+
+// passport 
+app.use(passport.initialize())
+app.use(passport.session())
+// use local strategy to authenticate 
+passport.use(new LocalStrategy(User.authenticate()))
+
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+
+
+
 // flash
 app.use((req,res,next) => {
-   res.locals.success = req.flash('success')
-   res.locals.errors = req.flash('error')
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success')
+    res.locals.error = req.flash('error')
 //    to move to our route handlers and the rest
    next()
 })
 
 
+// register 
+app.get('/fakeUser', async(req, res)=> {
+    const user = new User({email:'karim@gmail.com', username: 'karim'})
+    const newUser = await User.register(user, '12345')
+    res.send(newUser)
+
+}) 
+
+app.use('/', authenticationRoutes)
 app.use('/campgrounds',campgroundRoutes)
 app.use('/campgrounds/:id/reviews',reviewsRoutes)
 
