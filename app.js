@@ -5,7 +5,6 @@ if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
 
-
 // Node.js essentials to work with 
 const express = require('express')
 const path = require('path')
@@ -29,16 +28,16 @@ const LocalStrategy = require('passport-local')
 const User = require('./model/user')
 // helps secure the express app setting various HTTP headers
 const helmet = require("helmet");
-
-
+const MongoDBStore = require('connect-mongo')(session)
 // The sanitize function will strip out any keys that start with '$' in the input,
 // so you can pass it to MongoDB without worrying about malicious users overwriting
 // query selectors.
 const mongoSanitize = require('express-mongo-sanitize')
 
 
-// connecting to database with name yel-camp
-mongoose.connect('mongodb://localhost:27017/yelp-camp',{
+
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
+mongoose.connect( dbUrl,{
     useNewUrlParser: true,
     useUnifiedTopology:true,
     
@@ -49,6 +48,8 @@ db.on("error", console.error.bind(console, 'connection error'))
 db.once("open", () => {
     console.log('Database connected')
 })
+
+
 
 const app = express();
 
@@ -62,15 +63,32 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(mongoSanitize())
+app.use(mongoSanitize({replaceWith: '__'}))
+
+const secret = process.env.SECRET || 'thisshouldbetter'
+
+const store = new MongoDBStore ({
+    url:dbUrl,
+    secret,
+    // uncessary updates 
+    touchAfter: 24 * 60 * 60 // time period in seconds
+})
+
+
+store.on('error', function(e){
+    console.log("SESSION STORE ERROR",e)
+})
+
+
 
 
 // sessions
 // expire date so the user doesn't stay authenticated
-// this is good for the user to signin again after one week of the cookie expiring 
+// this is good for the user to sign in again after one week of the cookie expiring 
 const sessionConfig = {
+    store,
     name:'session',
-    secret: 'thisshouldbetter',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
