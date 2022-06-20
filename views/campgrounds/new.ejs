@@ -1,8 +1,10 @@
 <% layout('layouts/boilerplate')%>
 <h1 class="text-center">Add New CampSpots</h1>
 <div class="row">
-    <div class="col-6 offset-3">
-        <form action="/campgrounds" method="POST" novalidate class="validated-form">
+    <div class="col-md-6 offset-md-3">
+        <div class="card-shadow">
+            <div class="card-body">
+        <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label" for="title">Title</label>
                 <input class="form-control" placeholder="Title" type="text" id="title" name="campground[title]" required>
@@ -17,13 +19,7 @@
                     Looks Good!
                 </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="image">Image Url</label>
-                <input class="form-control" placeholder="Image" type="text" id="image" name="campground[image]" required>
-                <div class="valid-feedback">
-                    Looks Good!
-                </div>
-            </div>
+               
             <div class="mb-3">
                 <label class="form-label" for="price">Campground Price</label>
                 <div class="input-group">
@@ -35,6 +31,7 @@
                     Looks Good!
                 </div>
             </div>
+            
 
             <div class="mb-3">
                 <label class="form-label" for="description">Description</label>
@@ -44,11 +41,24 @@
                 </div>
             </div>
             <div class="mb-3">
+                <label for="">Upload Images</label>
+                <!-- we have to add custom file and custom file label -->
+                <div class="form-file custom-file">
+                    <input type="file" class="form-file-input" id="image" name="image" multiple>
+                    <label class="form-file-label" for="image">
+                        <span class="form-file-text custom-file-label">Choose image(s)...</span>
+                        <span class="form-file-button">Browse</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mb-3">
                 <button class="btn btn-primary">Add CampSpots</button>
             </div>
         </form>
         <a href="/campgrounds">All Campgrounds</a>
     </div>
+    </div>
+   </div>
 </div>
 
 

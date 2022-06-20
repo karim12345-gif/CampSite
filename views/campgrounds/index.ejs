@@ -1,30 +1,103 @@
-<% layout('layouts/boilerplate') %>
-<h1>ALL Campgrounds</h1>
-<div>
-  <a href="/campgrounds/new">Add products!</a>
+<%- layout('layouts/boilerplate') %>
+
+<div id="cluster-map"></div>
+<div class="container">
+<div class="text-center">
+  <h1>All Campgrounds</h1>
+  <p>
+   <h4 class="btn btn-primary">
+    <a class="text-light" href="/campgrounds/new">Add a New Campground</a>
+   </h4>
+  </p>
 </div>
 
-<% for (let campground of campgrounds){%>
-<div class="card" mb-3>
-  <div class="row">
-    <div class="col-md-4">
-      <img class="img-fluid" alt="" src="<%=campground.image%>" />
-    </div>
-    <div class="col-mg-8">
-      <div class="card-body">
-        <h5 class="card-title">
-          <%= campground.title%>
-        </h5>
-        <p class="card-text"><%= campground.description%></p>
-        <p class="card-text">
-            <small class="text-muted">
-                <%= campground.location%>
-            </small>
-        </p>
-        <a href="/campgrounds/<%=campground._id%> " class="btn btn-primary">View <%= campground.title %> </a>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Bootstrap5 Pagination  -->
+<nav aria-label="Page navigation" class="my-5">
+  <ul class="pagination justify-content-center">
 
-<% }%>
+    <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+      <a class="page-link" href="/campgrounds?page=<%= currentPage - 1 %>" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+
+    <% for (let i = 1; i <= totalPages; i++) { %>      
+      <% if (i === currentPage) { %>
+          <li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+      <% } else { %>
+          <li class="page-item"><a class="page-link" href="/campgrounds?page=<%= i %>"><%= i %></a></li>
+    <% }} %>
+    
+    <li class="page-item <%= (currentPage >= totalPages) ? 'disabled' : '' %> ">
+      <a class="page-link" 
+          href="/campgrounds?page=<%= currentPage + 1 %>" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<!-- displaying the campsite posts -->
+
+    <% for (let campground of campgrounds){%>
+    <div class="card mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <%if(campground.images.length) {%>
+                <img class="img-fluid" alt="" src="<%=campground.images[0].url%>">
+                <% }else {%>
+                <img class="img-fluid" alt=""
+                    src="https://res.cloudinary.com/douqbebwk/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                <% } %>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">
+                      <a class="" href="/campgrounds/<%=campground._id%>">View: <u><%=campground.title%></u></a>
+                    </h5>
+                    <p class="card-text"><%= campground.description %></p>
+                    <p class="card-text">
+                        <small class="text-muted"><%= campground.location%></small>
+                    </p>
+                    <a class="btn btn-primary" href="/campgrounds/<%=campground._id%>">View <%=campground.title%></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% }%>
+
+
+<!-- Bootstrap5 Pagination  -->
+<nav aria-label="Page navigation" class="my-5">
+  <ul class="pagination justify-content-center">
+
+    <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+      <a class="page-link" href="/campgrounds?page=<%= currentPage - 1 %>" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+
+    <% for (let i = 1; i <= totalPages; i++) { %>      
+      <% if (i === currentPage) { %>
+          <li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+      <% } else { %>
+          <li class="page-item"><a class="page-link" href="/campgrounds?page=<%= i %>"><%= i %></a></li>
+    <% }} %>
+    
+    <li class="page-item <%= (currentPage >= totalPages) ? 'disabled' : '' %> ">
+      <a class="page-link" 
+          href="/campgrounds?page=<%= currentPage + 1 %>" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+</div>
+<!-- token and converting campground -->
+<script>
+  const mapToken =  '<%- process.env.MAP_BOX_TOKEN%>'
+  const campgrounds = {features: <%- JSON.stringify(campgrounds) %>}
+</script>
+
+
+<script src="/style/clusterMap.js"></script>
