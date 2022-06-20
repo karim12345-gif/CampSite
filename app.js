@@ -79,9 +79,6 @@ store.on('error', function(e){
     console.log("SESSION STORE ERROR",e)
 })
 
-
-
-
 // sessions
 // expire date so the user doesn't stay authenticated
 // this is good for the user to sign in again after one week of the cookie expiring 
